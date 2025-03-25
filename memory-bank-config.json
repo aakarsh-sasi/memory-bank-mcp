@@ -1,0 +1,8 @@
+{
+  "mode": "code",
+  "remote": true,
+  "remoteUser": "username",
+  "remoteHost": "your.remote.host",
+  "remotePath": "/path/to/memory-bank",
+  "sshKey": "~/.ssh/your_ssh_key"
+} 

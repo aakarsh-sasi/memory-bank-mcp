@@ -1,10 +1,10 @@
 # Memory Bank MCP 🧠
 
-[![NPM Version](https://img.shields.io/npm/v/@movibe/memory-bank-mcp.svg)](https://www.npmjs.com/package/@movibe/memory-bank-mcp)
+[![NPM Version](https://img.shields.io/npm/v/@aakarsh-sasi/memory-bank-mcp.svg)](https://www.npmjs.com/package/@aakarsh-sasi/memory-bank-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml)
 
-A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions.
+A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions. Now with remote server support!
 
 <a href="https://glama.ai/mcp/servers/riei9a6dhx">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/riei9a6dhx/badge" alt="Memory Bank MCP server" />
@@ -25,6 +25,7 @@ Memory Bank Server provides a set of tools and resources for AI assistants to in
 - **UMB Command**: Update Memory Bank files temporarily with the UMB command
 - **Robust Error Handling**: Gracefully handle errors and continue operation when possible
 - **Status Prefix System**: Immediate visibility into Memory Bank operational state
+- **Remote Server Support**: Store Memory Banks on a remote server using SSH
 
 ## Directory Structure 📁
 
@@ -36,6 +37,7 @@ For more details on customizing the folder name, see [Custom Memory Bank Folder 
 
 ## Recent Improvements 🛠️
 
+- **Remote Server Support**: Store your Memory Bank on a remote server via SSH
 - **Customizable Folder Name**: You can now specify a custom folder name for the Memory Bank
 - **Consistent Directory Structure**: Memory Bank now always uses the configured folder name in the project root
 - **Enhanced Initialization**: Memory Bank now works even when .clinerules files don't exist
@@ -49,13 +51,13 @@ For more details, see [Memory Bank Bug Fixes](docs/memory-bank-bug-fixes.md).
 
 ```bash
 # Install from npm
-npm install @movibe/memory-bank-mcp
+npm install @aakarsh-sasi/memory-bank-mcp
 
 # Or install globally
-npm install -g @movibe/memory-bank-mcp
+npm install -g @aakarsh-sasi/memory-bank-mcp
 
 # Or run directly with npx (no installation required)
-npx @movibe/memory-bank-mcp
+npx @aakarsh-sasi/memory-bank-mcp
 ```
 
 ## Usage with npx 💻
@@ -64,22 +66,109 @@ You can run Memory Bank MCP directly without installation using npx:
 
 ```bash
 # Run with default settings
-npx @movibe/memory-bank-mcp
+npx @aakarsh-sasi/memory-bank-mcp
 
 # Run with specific mode
-npx @movibe/memory-bank-mcp --mode code
+npx @aakarsh-sasi/memory-bank-mcp --mode code
 
 # Run with custom project path
-npx @movibe/memory-bank-mcp --path /path/to/project
+npx @aakarsh-sasi/memory-bank-mcp --path /path/to/project
 
 # Run with custom folder name
-npx @movibe/memory-bank-mcp --folder custom-memory-bank
+npx @aakarsh-sasi/memory-bank-mcp --folder custom-memory-bank
+
+# Run with remote server
+npx @aakarsh-sasi/memory-bank-mcp --remote --remote-user username --remote-host example.host.com --remote-path /home/username/memory-bank
 
 # Show help
-npx @movibe/memory-bank-mcp --help
+npx @aakarsh-sasi/memory-bank-mcp --help
 ```
 
 For more detailed information about using npx, see [npx-usage.md](docs/npx-usage.md).
+
+## Using Remote Server Mode 🌐
+
+Memory Bank MCP now supports storing your Memory Bank on a remote server via SSH. This allows you to:
+
+1. **Centralize your Memory Bank**: Keep all your project memory in one place
+2. **Share Memory Banks**: Multiple users can access the same Memory Bank
+3. **Persistent Storage**: Your Memory Bank persists even if your local machine is wiped
+
+### Remote Server Requirements
+
+- SSH access to the remote server
+- SSH key authentication set up (password authentication is not supported)
+- Sufficient permissions to create/modify files in the specified directory
+
+### SSH Key Setup
+
+To set up SSH key authentication for the remote server:
+
+1. **Generate a new SSH key pair** (if you don't already have one):
+   
+   ```bash
+   # Using modern Ed25519 algorithm (recommended)
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   
+   # OR using RSA if required for compatibility
+   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+   ```
+
+2. **Start the SSH agent and add your key**:
+   
+   ```bash
+   # Start the agent
+   eval "$(ssh-agent -s)"
+   
+   # Add your key
+   ssh-add ~/.ssh/id_ed25519  # or ~/.ssh/id_rsa if you used RSA
+   ```
+
+3. **Copy your public key to the remote server**:
+   
+   ```bash
+   # Easiest method (if available)
+   ssh-copy-id username@your-remote-host.com
+   
+   # Alternative: manually copy your public key
+   cat ~/.ssh/id_ed25519.pub  # copy the output
+   ```
+   
+   Then paste the key into the `~/.ssh/authorized_keys` file on the remote server.
+
+4. **Test your connection**:
+   
+   ```bash
+   ssh username@your-remote-host.com
+   ```
+   
+   You should be able to log in without a password.
+
+For more detailed SSH key setup instructions, see our [SSH Keys Guide](docs/ssh-keys-guide.md).
+
+### Remote Server Configuration
+
+To use remote server mode, you need to provide the following parameters:
+
+```bash
+npx @aakarsh-sasi/memory-bank-mcp --remote \
+  --ssh-key ~/.ssh/your_ssh_key \
+  --remote-user username \
+  --remote-host example.host.com \
+  --remote-path /home/username/memory-bank
+```
+
+By default, the SSH key is assumed to be at `~/.ssh/your_ssh_key`. You can specify a different key using the `--ssh-key` option.
+
+### Remote Server Example
+
+```bash
+# Using with a server at example.host.com
+npx @aakarsh-sasi/memory-bank-mcp --remote \
+  --remote-user username \
+  --remote-host example.host.com \
+  --remote-path /home/username/memory-bank
+```
 
 ## Configuring in Cursor 🖱️
 
@@ -91,7 +180,7 @@ Cursor is an AI-powered code editor that supports the Model Context Protocol (MC
 
    ```bash
    # Verify npx is working correctly
-   npx @movibe/memory-bank-mcp --help
+   npx @aakarsh-sasi/memory-bank-mcp --help
    ```
 
 2. **Open Cursor Settings**:
@@ -103,7 +192,10 @@ Cursor is an AI-powered code editor that supports the Model Context Protocol (MC
 
    - **Name**: Memory Bank MCP
    - **Command**: npx
-   - **Arguments**: `@movibe/memory-bank-mcp --mode code` (or other mode as needed)
+   - **Arguments**: `@aakarsh-sasi/memory-bank-mcp --mode code` (or other mode as needed)
+   
+   For remote server:
+   - **Arguments**: `@aakarsh-sasi/memory-bank-mcp --mode code --remote --remote-user username --remote-host example.host.com --remote-path /home/username/memory-bank`
 
 4. **Save and Activate**:
 
@@ -134,30 +226,30 @@ Memory Bank MCP supports different operational modes to optimize AI interactions
 1. **Code Mode** 👨‍💻
 
    - Focus: Code implementation and development
-   - Usage: `npx @movibe/memory-bank-mcp --mode code`
+   - Usage: `npx @aakarsh-sasi/memory-bank-mcp --mode code`
    - Best for: Writing, refactoring, and optimizing code
 
 2. **Architect Mode** 🏗️
 
    - Focus: System design and architecture
-   - Usage: `npx @movibe/memory-bank-mcp --mode architect`
+   - Usage: `npx @aakarsh-sasi/memory-bank-mcp --mode architect`
    - Best for: Planning project structure, designing components, and making architectural decisions
 
 3. **Ask Mode** ❓
 
    - Focus: Answering questions and providing information
-   - Usage: `npx @movibe/memory-bank-mcp --mode ask`
+   - Usage: `npx @aakarsh-sasi/memory-bank-mcp --mode ask`
    - Best for: Getting explanations, clarifications, and information
 
 4. **Debug Mode** 🐛
 
    - Focus: Troubleshooting and problem-solving
-   - Usage: `npx @movibe/memory-bank-mcp --mode debug`
+   - Usage: `npx @aakarsh-sasi/memory-bank-mcp --mode debug`
    - Best for: Finding and fixing bugs, analyzing issues
 
 5. **Test Mode** ✅
    - Focus: Testing and quality assurance
-   - Usage: `npx @movibe/memory-bank-mcp --mode test`
+   - Usage: `npx @aakarsh-sasi/memory-bank-mcp --mode test`
    - Best for: Writing tests, test-driven development
 
 ### Switching Modes
@@ -167,7 +259,7 @@ You can switch modes in several ways:
 1. **When starting the server**:
 
    ```bash
-   npx @movibe/memory-bank-mcp --mode architect
+   npx @aakarsh-sasi/memory-bank-mcp --mode architect
    ```
 
 2. **During a session**:

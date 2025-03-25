@@ -190,8 +190,11 @@ export async function handleInitializeMemoryBank(
     console.error('Using absolute path:', absolutePath);
     
     try {
-      // Initialize the Memory Bank in the provided directory
-      await memoryBankManager.initializeMemoryBank(absolutePath);
+      // Set the custom path first
+      await memoryBankManager.setCustomPath(absolutePath);
+      
+      // Initialize the Memory Bank with createIfNotExists = true
+      await memoryBankManager.initialize(true);
       
       // Get the Memory Bank directory
       const memoryBankDir = memoryBankManager.getMemoryBankDir();

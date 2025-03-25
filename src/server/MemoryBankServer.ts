@@ -31,9 +31,28 @@ export class MemoryBankServer {
    * @param userId GitHub profile URL for tracking changes (optional)
    * @param folderName Memory Bank folder name (optional, default: 'memory-bank')
    * @param debugMode Enable debug mode (optional, default: false)
+   * @param remoteConfig Remote server configuration (optional)
    */
-  constructor(initialMode?: string, projectPath?: string, userId?: string, folderName?: string, debugMode?: boolean) {
-    this.memoryBankManager = new MemoryBankManager(projectPath, userId, folderName, debugMode);
+  constructor(
+    initialMode?: string, 
+    projectPath?: string, 
+    userId?: string, 
+    folderName?: string, 
+    debugMode?: boolean,
+    remoteConfig?: {
+      sshKeyPath: string;
+      remoteUser: string;
+      remoteHost: string;
+      remotePath: string;
+    }
+  ) {
+    this.memoryBankManager = new MemoryBankManager(
+      projectPath, 
+      userId, 
+      folderName, 
+      debugMode,
+      remoteConfig
+    );
     
     // Combine all tools
     const allTools = [
@@ -46,8 +65,8 @@ export class MemoryBankServer {
     
     this.server = new Server(
       {
-        name: '@movibe/memory-bank-mcp',
-        version: '0.1.0',
+        name: '@aakarsh-sasi/memory-bank-mcp',
+        version: '0.5.0',
       },
       {
         capabilities: {

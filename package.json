@@ -1,7 +1,7 @@
 {
-  "name": "@movibe/memory-bank-mcp",
-  "version": "0.4.1",
-  "description": "MCP Server for managing Memory Bank",
+  "name": "@aakarsh-sasi/memory-bank-mcp",
+  "version": "1.1.4",
+  "description": "MCP Server for managing Memory Bank with remote server support",
   "type": "module",
   "main": "build/index.js",
   "bin": {
@@ -28,22 +28,23 @@
     "assistant",
     "context"
   ],
-  "author": "Movibe",
+  "author": "Aakarsh Sasi (forked from Movibe)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/movibe/memory-bank-mcp.git"
+    "url": "git+https://github.com/aakarsh-sasi/memory-bank-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/movibe/memory-bank-mcp/issues"
+    "url": "https://github.com/aakarsh-sasi/memory-bank-mcp/issues"
   },
-  "homepage": "https://github.com/movibe/memory-bank-mcp#readme",
+  "homepage": "https://github.com/aakarsh-sasi/memory-bank-mcp#readme",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.6.1",
     "@types/js-yaml": "4.0.9",
+    "@types/node": "^20.4.5",
     "fs-extra": "^11.1.1",
     "js-yaml": "4.1.0",
     "path": "^0.12.7"
@@ -51,7 +52,6 @@
   "devDependencies": {
     "@types/bun": "^1.2.4",
     "@types/fs-extra": "^11.0.1",
-    "@types/node": "^20.4.5",
     "standard-version": "^9.5.0",
     "ts-node": "10.9.2",
     "typescript": "^5.1.6"

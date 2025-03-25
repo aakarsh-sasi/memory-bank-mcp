@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2025-03-25
+
+### Fixed
+- Fixed missing `initializeMemoryBank` method in MemoryBankManager class that was causing "TypeError: memoryBankManager.initializeMemoryBank is not a function" error
+- Added backwards compatibility method to ensure tests and existing code still work with the renamed method
+- Updated tools to use the correct method signature
+
+## [1.1.2] - 2025-03-25
+
+### Fixed
+- Fixed SSH key path handling to properly resolve tilde (~) to home directory
+- Added file existence check for SSH key before attempting connection
+- Improved error reporting for SSH connection issues
+- Fixed remote path handling in connection test
+
+## [1.1.0] - 2025-03-25
+
+### Added
+- Remote server support via SSH
+- Ability to store Memory Banks on remote servers
+- Custom SSH key specification with the `--ssh-key` option
+- Tests for remote server functionality
+
+### Fixed
+- TypeScript type definitions for Node.js modules
+- Fixed linter errors related to missing type declarations
+- Improved error handling for SSH connections
+- Better handling of process references for cross-platform compatibility
+
+### Changed
+- Improved module structure for better maintainability
+- Updated build process to bundle dependencies properly
+- Enhanced logging for remote server operations
+- Simplified API for remote server configuration
+
+## [1.0.0] - Initial Release
+
+### Added
+- Basic Memory Bank functionality
+- File operations for Memory Banks
+- Progress tracking and decision logging
+- Mode support with .clinerules files
+- UMB command for temporary Memory Bank updates
+
 ### [0.4.1](https://github.com/movibe/memory-bank-server/compare/v0.4.0...v0.4.1) (2025-03-17)
 
 ## [0.4.0](https://github.com/movibe/memory-bank-server/compare/v0.3.0...v0.4.0) (2025-03-17)

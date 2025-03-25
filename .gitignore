@@ -36,4 +36,16 @@ Thumbs.db
 
 # Arquivos de cache
 .cache/
-.temp/ 
+.temp/
+
+# Temporary and test files
+*.pid
+test-*.js
+*-wrapper.js
+
+# Absolute paths
+/Users/
+
+# Runtime scripts (unless specifically needed for distribution)
+run-*.sh
+prepare-*.sh 
