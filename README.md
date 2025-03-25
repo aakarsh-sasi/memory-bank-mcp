@@ -1,4 +1,4 @@
-# Memory Bank MCP 🧠
+# Memory Bank MCP With Remote SSH Support 🧠
 
 [![NPM Version](https://img.shields.io/npm/v/@aakarsh-sasi/memory-bank-mcp.svg)](https://www.npmjs.com/package/@aakarsh-sasi/memory-bank-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
