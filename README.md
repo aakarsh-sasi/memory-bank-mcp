@@ -358,7 +358,7 @@ memory-bank-mcp switch_mode mode=code
 ### As a Library 📚
 
 ```typescript
-import { MemoryBankServer } from "@movibe/memory-bank-mcp";
+import { MemoryBankServer } from "@aakarsh-sasi/memory-bank-mcp";
 
 // Create a new server instance
 const server = new MemoryBankServer();
