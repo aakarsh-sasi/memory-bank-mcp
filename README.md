@@ -3,6 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/@aakarsh-sasi/memory-bank-mcp.svg)](https://www.npmjs.com/package/@aakarsh-sasi/memory-bank-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/movibe/memory-bank-mcp/actions/workflows/test.yml)
+[![smithery badge](https://smithery.ai/badge/@aakarsh-sasi/memory-bank-mcp)](https://smithery.ai/server/@aakarsh-sasi/memory-bank-mcp)
 
 A Model Context Protocol (MCP) server for managing Memory Banks, allowing AI assistants to store and retrieve information across sessions. Now with remote server support!
 
@@ -49,6 +50,15 @@ For more details, see [Memory Bank Bug Fixes](docs/memory-bank-bug-fixes.md).
 
 ## Installation 🚀
 
+### Installing via Smithery
+
+To install Memory Bank for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@aakarsh-sasi/memory-bank-mcp):
+
+```bash
+npx -y @smithery/cli install @aakarsh-sasi/memory-bank-mcp --client claude
+```
+
+### Manual Installation
 ```bash
 # Install from npm
 npm install @aakarsh-sasi/memory-bank-mcp
