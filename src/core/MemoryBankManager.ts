@@ -36,6 +36,7 @@ import { MigrationUtils } from '../utils/MigrationUtils.js';
  */
 export class MemoryBankManager {
   private memoryBankDir: string | null = null;
+  private relativeMemoryBankPath: string | null = null; // Relative path for LocalFileSystem operations
   private customPath: string | null = null;
   private progressTracker: ProgressTracker | null = null;
   private modeManager: ModeManager | null = null;
@@ -319,22 +320,34 @@ export class MemoryBankManager {
   async initialize(createIfNotExists: boolean = true): Promise<string> {
     try {
       // Determine the Memory Bank path
+      // absoluteMemoryBankPath is for return value and API responses
+      // relativeMemoryBankPath is for LocalFileSystem methods (relative to baseDir)
       let memoryBankPath: string;
+      let relativeMemoryBankPath: string;
+      let absoluteMemoryBankPath: string;
       
       if (this.isRemote) {
         // For remote: use folderName directly under remote path (don't need to append to remotePath)
         memoryBankPath = this.folderName;
+        relativeMemoryBankPath = this.folderName;
+        absoluteMemoryBankPath = this.folderName;
         logger.debug('MemoryBankManager', `Initializing remote Memory Bank with path: ${memoryBankPath}`);
       } else if (this.customPath) {
         // Use the custom path if set (for local filesystem)
-        memoryBankPath = path.join(this.customPath, this.folderName);
+        absoluteMemoryBankPath = path.join(this.customPath, this.folderName);
+        relativeMemoryBankPath = this.folderName; // LocalFileSystem expects relative to baseDir
+        memoryBankPath = absoluteMemoryBankPath; // For backwards compatibility
       } else if (this.projectPath) {
         // Use the project path if set (for local filesystem)
-        memoryBankPath = path.join(this.projectPath, this.folderName);
+        absoluteMemoryBankPath = path.join(this.projectPath, this.folderName);
+        relativeMemoryBankPath = this.folderName; // LocalFileSystem expects relative to baseDir
+        memoryBankPath = absoluteMemoryBankPath; // For backwards compatibility
       } else {
         // Use the current directory as a fallback (for local filesystem)
         const currentDir = process?.cwd() || '.';
-        memoryBankPath = path.join(currentDir, this.folderName);
+        absoluteMemoryBankPath = path.join(currentDir, this.folderName);
+        relativeMemoryBankPath = this.folderName; // LocalFileSystem expects relative to baseDir
+        memoryBankPath = absoluteMemoryBankPath; // For backwards compatibility
       }
       
       // Create the Memory Bank directory if it doesn't exist
@@ -357,19 +370,19 @@ export class MemoryBankManager {
         }
         
         // Create the Memory Bank directory if it doesn't exist
-        const exists = await this.fileSystem.fileExists(memoryBankPath);
-        const isDir = exists ? await this.fileSystem.isDirectory(memoryBankPath) : false;
+        const exists = await this.fileSystem.fileExists(relativeMemoryBankPath);
+        const isDir = exists ? await this.fileSystem.isDirectory(relativeMemoryBankPath) : false;
         
         if (!exists || !isDir) {
-          logger.info('MemoryBankManager', `Creating Memory Bank directory at ${memoryBankPath}`);
-          await this.fileSystem.ensureDirectory(memoryBankPath);
+          logger.info('MemoryBankManager', `Creating Memory Bank directory at ${absoluteMemoryBankPath}`);
+          await this.fileSystem.ensureDirectory(relativeMemoryBankPath);
         }
         
         // Create core template files if they don't exist
         for (const template of coreTemplates) {
           const filePath = this.isRemote 
-            ? `${memoryBankPath}/${template.name}` 
-            : path.join(memoryBankPath, template.name);
+            ? `${relativeMemoryBankPath}/${template.name}` 
+            : path.join(relativeMemoryBankPath, template.name);
           
           const fileExists = await this.fileSystem.fileExists(filePath);
           if (!fileExists) {
@@ -383,26 +396,27 @@ export class MemoryBankManager {
           throw new Error('File system not initialized');
         }
         
-        const exists = await this.fileSystem.fileExists(memoryBankPath);
-        const isDir = exists ? await this.fileSystem.isDirectory(memoryBankPath) : false;
+        const exists = await this.fileSystem.fileExists(relativeMemoryBankPath);
+        const isDir = exists ? await this.fileSystem.isDirectory(relativeMemoryBankPath) : false;
         
         if (!exists || !isDir) {
-          throw new Error(`Memory Bank directory not found at ${memoryBankPath}`);
+          throw new Error(`Memory Bank directory not found at ${absoluteMemoryBankPath}`);
         }
       }
       
       // Set the memory bank directory
-      this.setMemoryBankDir(memoryBankPath);
+      this.setMemoryBankDir(absoluteMemoryBankPath);
+      this.relativeMemoryBankPath = relativeMemoryBankPath;
       
       // Initialize the progress tracker - ensure memoryBankPath is not null
-      if (memoryBankPath) {
-        this.progressTracker = new ProgressTracker(memoryBankPath, this.userId || undefined);
+      if (absoluteMemoryBankPath) {
+        this.progressTracker = new ProgressTracker(absoluteMemoryBankPath, this.userId || undefined);
       }
       
       // Welcome message
-      logger.info('MemoryBankManager', `Memory Bank initialized at ${memoryBankPath}`);
+      logger.info('MemoryBankManager', `Memory Bank initialized at ${absoluteMemoryBankPath}`);
       
-      return memoryBankPath;
+      return absoluteMemoryBankPath;
     } catch (error) {
       logger.error('MemoryBankManager', `Failed to initialize Memory Bank: ${error}`);
       throw new Error(`Failed to initialize Memory Bank: ${error instanceof Error ? error.message : String(error)}`);
@@ -426,7 +440,7 @@ export class MemoryBankManager {
         throw new Error('File system is not initialized');
       }
       
-      const filePath = this.isRemote ? `${this.memoryBankDir}/${filename}` : path.join(this.memoryBankDir, filename);
+      const filePath = this.isRemote ? `${this.getFileSystemPath()}/${filename}` : path.join(this.getFileSystemPath()!, filename);
       return await this.fileSystem.readFile(filePath);
     } catch (error) {
       logger.error('MemoryBankManager', `Failed to read file ${filename}: ${error}`);
@@ -458,7 +472,7 @@ export class MemoryBankManager {
         filename = migratedFilename;
       }
       
-      const filePath = this.isRemote ? `${this.memoryBankDir}/${filename}` : path.join(this.memoryBankDir, filename);
+      const filePath = this.isRemote ? `${this.getFileSystemPath()}/${filename}` : path.join(this.getFileSystemPath()!, filename);
       await this.fileSystem.writeFile(filePath, content);
     } catch (error) {
       logger.error('MemoryBankManager', `Failed to write to file ${filename}: ${error}`);
@@ -482,7 +496,7 @@ export class MemoryBankManager {
         throw new Error('File system is not initialized');
       }
       
-      return this.fileSystem.listFiles(this.memoryBankDir);
+      return this.fileSystem.listFiles(this.getFileSystemPath()!);
     } catch (error) {
       logger.error('MemoryBankManager', `Failed to list files: ${error}`);
       throw new Error(`Failed to list files: ${error instanceof Error ? error.message : String(error)}`);
@@ -634,6 +648,19 @@ export class MemoryBankManager {
     });
   }
 
+  /**
+   * Gets the path to use for FileSystem operations
+   * For non-remote: returns relative path
+   * For remote: returns the full path
+   * 
+   * @returns Path for filesystem operations
+   */
+  private getFileSystemPath(): string | null {
+    if (this.isRemote || !this.relativeMemoryBankPath) {
+      return this.memoryBankDir;
+    }
+    return this.relativeMemoryBankPath;
+  }
   /**
    * Gets the ProgressTracker
    * 
